@@ -1,2 +1,2 @@
-# database
-A lightweight wrapper around PDO
+# A lightweight wrapper around PDO
+
