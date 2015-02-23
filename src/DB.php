@@ -22,7 +22,8 @@ class DB
 {
     private static $_instance = null;
     
-    private $_dbh, $_host, $_dbname, $_user, $_pass;
+    private $_dbh, $_result, $_count, $_error, 
+            $_host, $_dbname, $_user, $_pass;
     
     public static function instance()
     {
@@ -55,14 +56,52 @@ class DB
     }
     
     /**
-     * PDO instance
+     * Get the PDO database handler
      * @return PDO handler
      */
-    public function pdo()
+    public function dbh()
     {
         return $this->_dbh;
     }
     
+    public function query($sql, $params=array())
+    {
+        $this->_error = false;
+        $sth = $this->_dbh->prepare($sql);
+        
+        if ($sth) {
+            if (count($params)) {
+                foreach ($params as $key=>$value) {
+                    $sth->bindValue($key+1, $value);
+                }
+            }
+            
+            if ($sth->execute()) {
+                $this->_result = $sth->fetchAll(PDO::FETCH_OBJ);
+                $this->_count = $sth->rowCount();
+            } else {
+                $this->_error = true;
+            }
+        }
+        
+        // Return the object to chain the methods
+        return $this;
+    }
+    
+    public function error()
+    {
+        return $this->_error;
+    }
+    
+    public function result()
+    {
+        return $this->_result;
+    }
+    
+    public function count()
+    {
+        return $this->_count;
+    }
     
     /**
      * Protected constructor to prevent creating a new instance of the
