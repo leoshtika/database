@@ -22,9 +22,19 @@ class DB
 {
     private static $_instance = null;
     
-    private $_dbh, $_result, $_count, $_error, 
-            $_host, $_dbname, $_user, $_pass;
+    private $_dbh, 
+			$_result = null, 
+			$_count = 0, 
+			$_error = false, 
+            $_host, 
+			$_dbname, 
+			$_user, 
+			$_pass;
     
+	/**
+	 * Singleton DB instance 
+	 * @return DB
+	 */
     public static function instance()
     {
         if (!isset(self::$_instance)) {
@@ -33,6 +43,15 @@ class DB
         return self::$_instance;
     }
     
+	/**
+	 * Connect to Database
+	 * @TODO: Validate args...
+	 * 
+	 * @param string $host
+	 * @param string $dbname
+	 * @param string $user
+	 * @param string $pass
+	 */
     public function connect($host, $dbname, $user, $pass)
     {
         $this->_host = $host;
@@ -43,13 +62,17 @@ class DB
         $this->_createDbHandler();
     }
     
-    /* @var PDO */
+    /**
+	 * Create a PDO handler
+	 */
     private function _createDbHandler()
     {
         try {
             $this->_dbh = new PDO('mysql:host='.$this->_host.';dbname='.$this->_dbname, $this->_user, $this->_pass);
+			$this->_dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch (PDOException $ex) {
-            echo 'DB connection problem';
+            echo 'There is a problem with your Database connection';
+			// @TODO: Add LEVEL_EXEPTION in logger
             Logger::add($ex->getMessage(), Logger::LEVEL_WARNING);
             die();
         }
@@ -57,16 +80,23 @@ class DB
     
     /**
      * Get the PDO database handler
-     * @return PDO handler
+     * @return PDO
      */
     public function dbh()
     {
         return $this->_dbh;
     }
     
+	/**
+	 * Execute a query with binded values
+	 * @param string $sql
+	 * @param array $params
+	 * @return DB
+	 */
     public function query($sql, $params=array())
     {
-        $this->_error = false;
+		$this->_resetQueryResult();
+		
         $sth = $this->_dbh->prepare($sql);
         
         if ($sth) {
@@ -75,33 +105,57 @@ class DB
                     $sth->bindValue($key+1, $value);
                 }
             }
-            
-            if ($sth->execute()) {
+			
+			try {
+				$sth->execute();
                 $this->_result = $sth->fetchAll(PDO::FETCH_OBJ);
                 $this->_count = $sth->rowCount();
-            } else {
+			} catch (PDOException $ex) {
                 $this->_error = true;
-            }
+				Logger::add($ex->getMessage(), Logger::LEVEL_WARNING);				
+			}
         }
         
         // Return the object to chain the methods
         return $this;
     }
     
+	/**
+	 * If there is an error in a query it will return true
+	 * @return boolean
+	 */
     public function error()
     {
         return $this->_error;
     }
     
+	/**
+	 * Query result
+	 * @return array of objects
+	 */
     public function result()
     {
         return $this->_result;
     }
     
+	/**
+	 * Count of query result
+	 * @return type
+	 */
     public function count()
     {
         return $this->_count;
     }
+	
+	/**
+	 * Reset all the results from a query to use in a new one
+	 */
+	private function _resetQueryResult()
+	{
+		$this->_error = false;
+		$this->_result = null;
+		$this->_count = 0;	
+	}
     
     /**
      * Protected constructor to prevent creating a new instance of the
