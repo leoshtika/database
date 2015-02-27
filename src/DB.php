@@ -25,11 +25,7 @@ class DB
     private $_dbh, 
 			$_result = null, 
 			$_count = 0, 
-			$_error = false, 
-            $_host, 
-			$_dbname, 
-			$_user, 
-			$_pass;
+			$_error = false;
     
 	/**
 	 * Singleton DB instance 
@@ -44,7 +40,7 @@ class DB
     }
     
 	/**
-	 * Connect to Database
+	 * Connect to MySQL Database
 	 * @TODO: Validate args...
 	 * 
 	 * @param string $host
@@ -52,23 +48,10 @@ class DB
 	 * @param string $user
 	 * @param string $pass
 	 */
-    public function connect($host, $dbname, $user, $pass)
-    {
-        $this->_host = $host;
-        $this->_dbname = $dbname;
-        $this->_user = $user;
-        $this->_pass = $pass;
-        
-        $this->_createDbHandler();
-    }
-    
-    /**
-	 * Create a PDO handler
-	 */
-    private function _createDbHandler()
+    public function connectMysql($host, $dbname, $user, $pass)
     {
         try {
-            $this->_dbh = new PDO('mysql:host='.$this->_host.';dbname='.$this->_dbname, $this->_user, $this->_pass);
+            $this->_dbh = new PDO('mysql:host='.$host.';dbname='.$dbname, $user, $pass);
 			$this->_dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch (PDOException $ex) {
             echo 'There is a problem with your Database connection';
@@ -77,6 +60,19 @@ class DB
             die();
         }
     }
+	
+	/**
+	 * Connect to SQLite Database and create a PDO handler
+	 * @param string $sqliteDsn
+	 */
+	public function connectSqlite($sqliteDsn)
+	{
+		try {
+			$this->_dbh = new PDO($sqliteDsn);
+		} catch (PDOException $ex) {
+			echo $ex->getMessage();
+		}
+	}
     
     /**
      * Get the PDO database handler
