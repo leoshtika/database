@@ -41,7 +41,6 @@ class DB
     
 	/**
 	 * Connect to MySQL Database
-	 * @TODO: Validate args...
 	 * 
 	 * @param string $host
 	 * @param string $dbname
@@ -55,15 +54,14 @@ class DB
 			$this->_dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch (PDOException $ex) {
             echo 'There is a problem with your MySQL Database connection';
-			// @TODO: Add LEVEL_EXEPTION in logger
-            Logger::add($ex->getMessage(), Logger::LEVEL_WARNING);
+            Logger::add($ex->getMessage(), Logger::LEVEL_CRITICAL);
             die();
         }
     }
 	
 	/**
 	 * Connect to SQLite Database and create a PDO handler
-	 * @param string $sqliteDsn
+	 * @param string $dbPath
 	 */
 	public function connectSqlite($dbPath)
 	{
@@ -72,7 +70,7 @@ class DB
 			$this->_dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 		} catch (PDOException $ex) {
 			echo 'There is a problem with your SQLite Database connection';
-			Logger::add($ex->getMessage(), Logger::LEVEL_WARNING);
+			Logger::add($ex->getMessage(), Logger::LEVEL_CRITICAL);
 			die();
 		}
 	}
@@ -112,10 +110,9 @@ class DB
 			}
 		} catch (PDOException $ex) {
 			$this->_error = true;
-			Logger::add($ex->getMessage(), Logger::LEVEL_WARNING);				
+			Logger::add($ex->getMessage(), Logger::LEVEL_CRITICAL);				
 		}
 
-        
         // Return the object to chain the methods
         return $this;
     }
