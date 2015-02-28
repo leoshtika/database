@@ -54,7 +54,7 @@ class DB
             $this->_dbh = new PDO('mysql:host='.$host.';dbname='.$dbname, $user, $pass);
 			$this->_dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch (PDOException $ex) {
-            echo 'There is a problem with your Database connection';
+            echo 'There is a problem with your MySQL Database connection';
 			// @TODO: Add LEVEL_EXEPTION in logger
             Logger::add($ex->getMessage(), Logger::LEVEL_WARNING);
             die();
@@ -65,12 +65,15 @@ class DB
 	 * Connect to SQLite Database and create a PDO handler
 	 * @param string $sqliteDsn
 	 */
-	public function connectSqlite($sqliteDsn)
+	public function connectSqlite($dbPath)
 	{
 		try {
-			$this->_dbh = new PDO($sqliteDsn);
+			$this->_dbh = new PDO('sqlite:'.$dbPath);
+			$this->_dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 		} catch (PDOException $ex) {
-			echo $ex->getMessage();
+			echo 'There is a problem with your SQLite Database connection';
+			Logger::add($ex->getMessage(), Logger::LEVEL_WARNING);
+			die();
 		}
 	}
     
@@ -92,25 +95,26 @@ class DB
     public function query($sql, $params=array())
     {
 		$this->_resetQueryResult();
-		
-        $sth = $this->_dbh->prepare($sql);
-        
-        if ($sth) {
-            if (count($params)) {
-                foreach ($params as $key=>$value) {
-                    $sth->bindValue($key+1, $value);
-                }
-            }
-			
-			try {
+
+		try {
+			$sth = $this->_dbh->prepare($sql);
+
+			if ($sth) {
+				if (count($params)) {
+					foreach ($params as $key=>$value) {
+						$sth->bindValue($key+1, $value);
+					}
+				}
+
 				$sth->execute();
-                $this->_result = $sth->fetchAll(PDO::FETCH_OBJ);
-                $this->_count = $sth->rowCount();
-			} catch (PDOException $ex) {
-                $this->_error = true;
-				Logger::add($ex->getMessage(), Logger::LEVEL_WARNING);				
+				$this->_result = $sth->fetchAll(PDO::FETCH_OBJ);
+				$this->_count = $sth->rowCount();
 			}
-        }
+		} catch (PDOException $ex) {
+			$this->_error = true;
+			Logger::add($ex->getMessage(), Logger::LEVEL_WARNING);				
+		}
+
         
         // Return the object to chain the methods
         return $this;

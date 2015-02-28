@@ -8,7 +8,7 @@ use leoshtika\libs\DB;
 use leoshtika\libs\Logger;
 
 // DB::instance()->connectMysql('localhost', 'leoshtika_database', 'root', '');
-DB::instance()->connectSqlite('sqlite:data/db.sqlite');
+DB::instance()->connectSqlite('data/db.sqlite');
 
 // Get all active users
 $active = 1;
