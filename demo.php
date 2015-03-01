@@ -5,10 +5,15 @@
 require_once 'vendor/autoload.php';
 
 use leoshtika\libs\DB;
-use leoshtika\libs\Logger;
+use leoshtika\libs\UserFaker;
 
 // DB::instance()->connectMysql('localhost', 'leoshtika_database', 'root', '');
-DB::instance()->connectSqlite('data/db.sqlite');
+$sqliteFile = 'demo.sqlite';
+if (!file_exists($sqliteFile)) {
+	UserFaker::create($sqliteFile);
+}
+DB::instance()->connectSqlite($sqliteFile);
+
 
 // Get all active users
 $active = 1;
@@ -28,12 +33,11 @@ $active = 1;
 //	Logger::add($ex->getMessage(), Logger::LEVEL_WARNING);
 //}
 
-
-$users = DB::instance()->query('SELECT * FROM user WHERE active = ?', array($active));
+// @TODO: Fix query for more general input data
+$users = DB::instance()->query("SELECT * FROM user");
 if (!$users->error()) {
     foreach ($users->result() as $user) {
-        echo $user->name;
-        echo '<hr>';
+		echo "{$user->id} {$user->name} ({$user->email})<br>";
     }
 } else {
     echo 'There is a problem with your query';
