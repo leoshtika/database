@@ -13,7 +13,6 @@ namespace leoshtika\libs;
 
 use \PDO;
 use \PDOException;
-use leoshtika\libs\Logger;
 
 /**
  * DB class using 'Singleton' pattern.
