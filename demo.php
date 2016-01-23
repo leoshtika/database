@@ -10,7 +10,7 @@ use leoshtika\libs\UserFaker;
 // DB::instance()->connectMysql('localhost', 'leoshtika_database', 'root', '');
 $sqliteFile = 'demo.sqlite';
 if (!file_exists($sqliteFile)) {
-	UserFaker::create($sqliteFile);
+    UserFaker::create($sqliteFile);
 }
 DB::instance()->connectSqlite($sqliteFile);
 
@@ -37,7 +37,7 @@ $active = 1;
 $users = DB::instance()->query("SELECT * FROM user");
 if (!$users->error()) {
     foreach ($users->result() as $user) {
-		echo "{$user->id} {$user->name} ({$user->email})<br>";
+        echo "{$user->id} {$user->name} ({$user->email})<br>";
     }
 } else {
     echo 'There is a problem with your query';
