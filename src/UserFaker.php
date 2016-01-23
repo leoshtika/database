@@ -13,32 +13,32 @@ use \Faker;
 class UserFaker
 {
 
-    public static function create($sqliteFile = 'demo.sqlite', $newRecords = 123)
+    public static function create($sqliteFile, $newRecords = 32)
     {
         if (file_exists($sqliteFile)) {
-            echo 'This (' . $sqliteFile . ') SQLite database already exists...<br>';
+            echo 'This (' . $sqliteFile . ') SQLite database already exists<br>';
         } else {
-            echo 'A new (' . $sqliteFile . ') SQLite database was created...<br>';
+            echo 'A new (' . $sqliteFile . ') SQLite database was created<br>';
         }
 
-        DB::instance()->connectSqlite($sqliteFile);
+        $dbh = Sqlite::connect($sqliteFile);
 
         try {
             $sql = "CREATE TABLE IF NOT EXISTS user (
-					id		INTEGER PRIMARY KEY AUTOINCREMENT,
-					name	TEXT,
-					email	TEXT,
-					address TEXT,
-					phone   TEXT);";
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        name TEXT,
+                        email TEXT,
+                        address TEXT,
+			phone TEXT);";
 
-            $create = DB::instance()->dbh()->prepare($sql);
+            $create = $dbh->prepare($sql);
             $create->execute();
 
             // Start adding dummy data to the db with the help of Faker
             $faker = Faker\Factory::create();
 
             for ($i = 1; $i <= $newRecords; $i++) {
-                $sth = DB::instance()->dbh()->prepare('INSERT INTO user (name, email, address, phone) 
+                $sth = $dbh->prepare('INSERT INTO user (name, email, address, phone) 
 																 VALUES (:name, :email, :address, :phone)');
                 $sth->bindParam(':name', $faker->name, PDO::PARAM_STR);
                 $sth->bindParam(':email', $faker->email, PDO::PARAM_STR);

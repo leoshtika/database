@@ -1,7 +1,7 @@
 <?php
 
 /**
- * DB: A lightweight wrapper around PDO
+ * A lightweight wrapper around PDO
  * 
  * @author Leonard Shtika <leonard@shtika.info>
  * @link http://leonard.shtika.info
