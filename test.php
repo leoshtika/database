@@ -4,11 +4,17 @@ require_once 'vendor/autoload.php';
 
 use leoshtika\libs\DB;
 
-$dbh1 = DB::connect('localhost', 'myapp', 'root', '');
+$dbConfig = array(
+    'dsn' => 'mysql:dbname=crowd_notes;host=localhost',
+    'user' => 'root',
+    'pass' => '',
+);
+
+$dbh1 = DB::connect($dbConfig);
 var_dump($dbh1);
-$dbh2 = DB::connect('localhost', 'myapp', 'root', '');
+$dbh2 = DB::connect($dbConfig);
 var_dump($dbh2);
-$dbh3 = DB::connect('localhost', 'myapp', 'root', '');
+$dbh3 = DB::connect($dbConfig);
 var_dump($dbh3);
 
 

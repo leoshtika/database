@@ -16,7 +16,7 @@ use \PDOException;
 use leoshtika\libs\Logger;
 
 /**
- * DB class file
+ * DB class using 'Singleton' pattern.
  * @property PDO $_instance
  */
 class DB
@@ -24,29 +24,37 @@ class DB
 
     private static $_instance;
 
-    private function __construct($host, $dbname, $user, $pass)
+    /**
+     * Connects to the database and creates a PDO instance
+     * @param array $dbConfig
+     */
+    private function __construct($dbConfig)
     {
         try {
-            self::$_instance = new PDO('mysql:host=' . $host . ';dbname=' . $dbname, $user, $pass);
+            self::$_instance = new PDO($dbConfig['dsn'], $dbConfig['user'], $dbConfig['pass']);
             self::$_instance->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch (PDOException $ex) {
-            echo 'There is a problem with your Database connection';
+            echo 'There is a problem with your database connection';
             Logger::add($ex->getMessage(), Logger::LEVEL_CRITICAL);
             die();
         }
     }
-    
-    public static function connect($host, $dbname, $user, $pass)
+
+    /**
+     * Returns a PDO instance and makes sure only one database connection is created
+     * @param array $dbConfig
+     * @return PDO
+     */
+    public static function connect($dbConfig)
     {
         if (!self::$_instance) {
-            new DB($host, $dbname, $user, $pass);
+            new DB($dbConfig);
         }
         return self::$_instance;
     }
-    
 
     /**
-     * Private clone method to prevent cloning the 'Singleton' instance.
+     * Private __clone method prevents cloning the 'Singleton' instance.
      */
     private function __clone()
     {
@@ -54,7 +62,7 @@ class DB
     }
 
     /**
-     * Private unserialize method to prevent unserializing of the 'Singleton' instance.
+     * Private __wakeup method prevents unserializing the 'Singleton' instance.
      */
     private function __wakeup()
     {
