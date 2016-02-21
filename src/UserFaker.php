@@ -57,7 +57,7 @@ class UserFaker
             }
             
         } else {
-            echo '<strong>Reading from ' . $sqliteFile . ' sqlite database.</strong><hr>';
+            echo 'Attention! Remove <code>UserFaker::create()</code> line from your code. ' . $sqliteFile . ' database already exists.<hr>';
         }
     }
 
