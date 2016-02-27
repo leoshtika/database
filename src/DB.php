@@ -30,7 +30,11 @@ class DB
     private function __construct($dbConfig)
     {
         try {
-            self::$_instance = new PDO($dbConfig['dsn'], $dbConfig['user'], $dbConfig['pass']);
+            if ($dbConfig['options']) {
+                self::$_instance = new PDO($dbConfig['dsn'], $dbConfig['user'], $dbConfig['pass'], $dbConfig['options']);
+            } else {
+                self::$_instance = new PDO($dbConfig['dsn'], $dbConfig['user'], $dbConfig['pass']);
+            }
             self::$_instance->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch (PDOException $ex) {
             echo 'There is a problem with your database connection';

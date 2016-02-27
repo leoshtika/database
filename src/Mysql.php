@@ -11,6 +11,8 @@
 
 namespace leoshtika\libs;
 
+use PDO;
+
 /**
  * Mysql class extends the (Singleton PDO wrapper) DB class
  */
@@ -28,6 +30,7 @@ class Mysql extends DB
             'dsn' => 'mysql:dbname=' . $mysqlConfig['dbname'] . ';host=' . $mysqlConfig['host'],
             'user' => $mysqlConfig['user'],
             'pass' => $mysqlConfig['pass'],
+            'options' => array(PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8"),
         );
 
         return parent::connect($dbConfig);
